@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>امتحان مقترح - الحكومة الإلكترونية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1A1110; /* بني داكن جداً / أسود دافئ */
+            --card-bg: #2E1B18; /* عنابي داكن / بني محمر */
+            --primary-color: #D4AF37; /* ذهبي دافئ */
+            --text-color: #FDF7F2; /* أبيض كريمي دافئ */
+            --btn-bg: #5C2C26; /* أحمر طوبي داكن */
+            --btn-hover: #7D3C34;
+            --correct-color: #2E7D32;
+            --wrong-color: #C62828;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #3A201C, #1A1110);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border: 2px solid #4A2E2A;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+        }
+
+        .logo-container img {
+            max-width: 200px;
+            margin-bottom: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+            background: #fff;
+            padding: 10px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .author {
+            font-size: 22px;
+            color: #E8A87C;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .start-btn {
+            background-color: var(--primary-color);
+            color: #1A1110;
+            border: none;
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            background-color: #F3CA40;
+        }
+
+        /* Quiz Screen */
+        .quiz-screen {
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #1A1110;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .question-text {
+            font-size: 26px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .option {
+            background-color: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid #4A2E2A;
+            padding: 18px 25px;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: right;
+            transition: all 0.2s;
+        }
+
+        .option:hover:not(:disabled) {
+            background-color: var(--btn-hover);
+            border-color: var(--primary-color);
+            transform: translateX(-5px);
+        }
+
+        .option:disabled {
+            cursor: not-allowed;
+        }
+
+        .option.correct {
+            background-color: var(--correct-color);
+            border-color: #4CAF50;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+        }
+
+        .option.wrong {
+            background-color: var(--wrong-color);
+            border-color: #F44336;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.5);
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 80px;
+            color: var(--primary-color);
+            font-weight: 900;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+
+        .result-message {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background-color: var(--btn-bg);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        /* Animations overlay */
+        #effects-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Hearts Animation */
+        .heart {
+            position: absolute;
+            font-size: 40px;
+            animation: floatUp 2s ease-in forwards;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 1; }
+            50% { transform: translateY(50vh) scale(1.5); opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+        }
+
+        /* Angry Face Animation */
+        .angry-face {
+            font-size: 150px;
+            animation: shakeFade 1.5s ease-out forwards;
+            filter: drop-shadow(0 0 30px rgba(255,0,0,0.8));
+        }
+
+        @keyframes shakeFade {
+            0% { transform: scale(0.5); opacity: 0; }
+            10% { transform: scale(1.2); opacity: 1; }
+            20% { transform: scale(1) rotate(-15deg); }
+            30% { transform: scale(1) rotate(15deg); }
+            40% { transform: scale(1) rotate(-15deg); }
+            50% { transform: scale(1) rotate(15deg); }
+            60% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- طبقة التأثيرات (قلوب / وجه غاضب) -->
+    <div id="effects-layer"></div>
+
+    <div class="container">
+        
+        <!-- شاشة البداية -->
+        <div class="start-screen" id="start-screen">
+            <div class="logo-container">
+                <img src="20439a51-e083-4529-8c24-055d9f9031c4" alt="شعار جامعة إربد الأهلية" onerror="this.src='https://upload.wikimedia.org/wikipedia/ar/3/30/Irbid_National_University_Logo.png'">
+            </div>
+            <h1>امتحان مقترح - مساق الحكومة الإلكترونية</h1>
+            <p style="font-size: 20px; color: #ccc; margin-bottom: 10px;">امتحان شامل (40 سؤال) باتجاه واحد</p>
+            <div class="author">إعداد الطالب: قيس جازي</div>
+            <button class="start-btn" onclick="startQuiz()">ابدأ الامتحان الآن</button>
+        </div>
+
+        <!-- شاشة الامتحان -->
+        <div class="quiz-screen" id="quiz-screen">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="question-header">
+                <span id="question-number">السؤال 1 من 40</span>
+                <span id="score-tracker">النقاط: 0</span>
+            </div>
+            <div class="question-text" id="question-text">
+                نص السؤال يظهر هنا...
+            </div>
+            <div class="options-container" id="options-container">
+                <!-- الأزرار تضاف برمجياً -->
+            </div>
+        </div>
+
+        <!-- شاشة النتيجة -->
+        <div class="result-screen" id="result-screen">
+            <h1>انتهى الامتحان!</h1>
+            <div class="author">إعداد: قيس جازي</div>
+            <p class="result-message" id="result-message">نتيجتك النهائية هي:</p>
+            <div class="score-display" id="final-score">0/40</div>
+            <button class="restart-btn" onclick="location.reload()">إعادة الامتحان</button>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            // 1-5 المفاهيم
+            { q: "ما هو المنظور الحديث للحكومة الإلكترونية؟", options: ["مجموعة مواقع إلكترونية بتصميم جميل", "نظام واحد متكامل لتبادل المعلومات (One Stop Shop)", "أتمتة الأعمال الورقية فقط", "استخدام الحواسيب داخل المكاتب فقط"], answer: 1 },
+            { q: "الإدارة الذكية (Smart Management) تعتمد بشكل أساسي على:", options: ["التقارير الورقية التقليدية", "تفاعل المواطن عند الطلب (Reactive)", "البيانات الضخمة والذكاء الاصطناعي (Proactive)", "قواعد البيانات المركزية القديمة"], answer: 2 },
+            { q: "ما المقصود بالتكامل الأفقي في الحكومة الإلكترونية؟", options: ["توفير الخدمات 24 ساعة طوال أيام الأسبوع", "تخفيض رواتب الموظفين", "الاستغناء عن التكنولوجيا", "دمج الدوائر الحكومية بمبنى واحد"], answer: 0 },
+            { q: "المعرفة الأكثر قيمة والتي تقود إلى الابتكار وتتواجد في عقول الأفراد تسمى:", options: ["المعرفة الظاهرية", "المعرفة الضمنية", "المعرفة الرقمية", "المعرفة المكتوبة"], answer: 1 },
+            { q: "رمز (G2B) في تصنيفات الحكومة الإلكترونية يشير إلى تفاعل الحكومة مع:", options: ["المواطنين (Citizens)", "الحكومات الأخرى (Governments)", "الأعمال والشركات (Business)", "الموظفين (Employees)"], answer: 2 },
+            
+            // 6-10 الأهداف والآثار
+            { q: "من الآثار 'الداخلية' (على المستوى المؤسسي) لتطبيق الحكومة الإلكترونية:", options: ["زيادة مرونة المواطن", "تجنب التكرار وخفض كلفة إنجاز المعاملات", "التمكين الأعظم للمواطن", "مشاركة أكبر من الجمهور"], answer: 1 },
+            { q: "واحدة من الآتية ليست من أهداف الحكومة الإلكترونية:", options: ["تقليل البيروقراطية", "اختصار الوقت", "زيادة عدد الموظفين وتعقيد الإجراءات", "زيادة الشفافية"], answer: 2 },
+            { q: "النافذة الموحدة (One Stop Shop) تهدف إلى:", options: ["تشتيت المواطن بين الوزارات", "زيادة التكرار", "تقليص خطوات إنجاز المعاملة في بؤرة واحدة", "منع استخدام الإنترنت"], answer: 2 },
+            { q: "تقديم الخدمات وتوقع احتياجات المواطن قبل طلبها يعرف بـ:", options: ["خدمات تقليدية", "خدمات استباقية (Proactive)", "خدمات تفاعلية", "خدمات يدوية"], answer: 1 },
+            { q: "من الآثار 'الخارجية' لتطبيق الحكومة الإلكترونية:", options: ["أمن إدارة المعلومات داخل الوزارة", "السرعة في توفير الخدمة للمستفيد (المواطن)", "تبسيط الإجراءات للموظف", "التنسيق بين الدوائر الحكومية"], answer: 1 },
+            
+            // 11-15 مراحل التطور
+            { q: "في أي مرحلة يتم 'نشر المعلومات والنماذج عبر مواقع الوزارات'؟", options: ["مرحلة التفاعل", "مرحلة المعاملات", "مرحلة الحضور الإلكتروني", "مرحلة الحكومة الذكية"], answer: 2 },
+            { q: "تقديم الطلبات ودفع الرسوم إلكترونياً يمثل مرحلة:", options: ["المعاملات", "التفاعل", "الحضور", "الحكومة الذكية"], answer: 0 },
+            { q: "مرحلة 'التحول المتكامل' تتميز بـ:", options: ["وجود موقع إلكتروني للقراءة فقط", "تبادل البيانات تلقائياً بين المؤسسات", "تنزيل النماذج وطباعتها", "الاستغناء الكامل عن الموظفين"], answer: 1 },
+            { q: "أي مرحلة تعتمد على الذكاء الاصطناعي والقرارات المبنية على البيانات؟", options: ["الحضور", "التفاعل", "المعاملات", "الحكومة الذكية"], answer: 3 },
+            { q: "التواصل عبر البريد الإلكتروني وتقديم شكاوى يمثل مرحلة:", options: ["التحول المتكامل", "التفاعل", "الحضور", "الذكاء الاصطناعي"], answer: 1 },
+
+            // 16-20 المعوقات والمهارات
+            { q: "مقاومة التغيير من قبل الموظفين خوفاً من فقدان وظائفهم يعتبر معوقاً:", options: ["تقنياً", "تنظيمياً وإدارياً", "قانونياً", "مالياً"], answer: 1 },
+            { q: "غياب تشريعات التوقيع الإلكتروني وحماية البيانات يندرج تحت المعوقات:", options: ["الاجتماعية", "البشرية", "القانونية والتشريعية", "التقنية"], answer: 2 },
+            { q: "انعدام ثقة المواطن بالخدمات والفجوة الرقمية تعتبر تحديات:", options: ["تقنية", "مالية", "اجتماعية وثقافية", "إدارية"], answer: 2 },
+            { q: "مهارة 'إعادة هندسة الإجراءات (BPR)' تندرج تحت مهارات:", options: ["تقنية", "قانونية", "تحليل الأعمال", "اتصال وتواصل"], answer: 2 },
+            { q: "من مستلزمات البناء 'البنية التحتية التقنية' وتشمل:", options: ["التشريعات", "منصات التكامل (Interoperability) والهوية الرقمية", "التدريب المجتمعي", "تبسيط الإجراءات الورقية"], answer: 1 },
+
+            // 21-25 الذكاء الاصطناعي و Dashboards
+            { q: "لوحات المعلومات الذكية (E-Government Dashboards) تستخدم بشكل رئيسي لـ:", options: ["تصفح الأخبار", "دعم اتخاذ القرار للإدارة العليا وعرض المؤشرات (KPIs)", "إرسال الإيميلات للموظفين", "تصميم المواقع"], answer: 1 },
+            { q: "الدولة التي تعتبر الأفضل عالمياً 'تقنياً' في لوحات المعلومات بمنصة (X-Road) هي:", options: ["سنغافورة", "بريطانيا", "أمريكا", "إستونيا"], answer: 3 },
+            { q: "استخدام المساعد الذكي 'راشد' في دبي يمثل تطبيقاً لـ:", options: ["التعرف على الوجوه", "المدن الذكية", "المساعدات الذكية (Chatbots)", "التنبؤ بالبطالة"], answer: 2 },
+            { q: "تحليل الذكاء الاصطناعي للإقرارات الضريبية يهدف إلى:", options: ["إدارة المرور", "كشف الاحتيال والفساد تلقائياً", "التعرف على الوجوه", "أتمتة الموارد البشرية"], answer: 1 },
+            { q: "تعديل إشارات المرور تلقائياً لتقليل الازدحام يندرج تحت تطبيقات:", options: ["المدن الذكية وإدارة المرور", "التعليم الذكي", "الصحة الذكية", "الجوازات"], answer: 0 },
+
+            // 26-30 تجارب ومفاهيم
+            { q: "وفقاً لتصنيف الأمم المتحدة 2024، ما هي الدولة التي احتلت المركز الأول عالمياً؟", options: ["كوريا الجنوبية", "سنغافورة", "الدنمارك", "إستونيا"], answer: 2 },
+            { q: "دولة عربية تعتبر رائدة ومصنفة (Very High) في الحكومة الرقمية:", options: ["الأردن", "مصر", "الإمارات العربية المتحدة", "لبنان"], answer: 2 },
+            { q: "من الدروس المستفادة من التجارب العالمية:", options: ["البنية التحتية غير مهمة", "تكامل البيانات يقضي على البيروقراطية", "الذكاء الاصطناعي رفاهية لا حاجة لها", "الورق أأمن من الرقمي"], answer: 1 },
+            { q: "الإدارة الإلكترونية تختلف عن الإدارة الذكية بأنها تعتمد على:", options: ["الاستباق والتنبؤ", "الذكاء الاصطناعي وبحيرات البيانات", "لوحات القيادة الفورية", "أنظمة ERP وتفاعل عند الطلب (Reactive)"], answer: 3 },
+            { q: "الحكومة الرقمية تعتمد على تقنيات:", options: ["الورق والقلم", "الإنترنت الأساسي فقط", "البيانات الضخمة (Big Data) والمنصات", "قواعد بيانات الأكسس القديمة"], answer: 2 },
+
+            // 31-35 المخاطر الأمنية
+            { q: "هجمات حجب الخدمة (DDoS) تهدف إلى:", options: ["تشفير البيانات وطلب فدية", "إغراق الموقع الحكومي بطلبات هائلة لتعطيله", "سرقة الأموال من البنوك", "تغيير شكل الموقع"], answer: 1 },
+            { q: "موظف حكومي يستغل صلاحياته للوصول لبيانات شخصية، هذا يعتبر:", options: ["تهديدات متقدمة", "تهديدات البنية التحتية", "تهديدات داخلية (Insider Threats)", "هجوم DDoS"], answer: 2 },
+            { q: "البرمجيات التي تقوم بتشفير البيانات وتطلب مقابلاً مالياً لفكها تسمى:", options: ["Data Breach", "Ransomware (برامج الفدية)", "Chatbots", "ERP"], answer: 1 },
+            { q: "الهجمات المنظمة المدعومة من دول تستهدف بنية دولة أخرى تسمى:", options: ["Cyber Warfare (حرب سيبرانية)", "الإهمال البشري", "تهديدات خصوصية", "هجمات الفدية"], answer: 0 },
+            { q: "مشاركة بيانات المواطنين بين الوزارات دون ضوابط أو تشفير يعتبر:", options: ["تهديداً للخصوصية", "تقدماً تكنولوجياً", "تحدياً مالياً", "جزءاً من الديمقراطية"], answer: 0 },
+
+            // 36-40 أسئلة سيناريو وتحليل (تفكير ناقد)
+            { q: "سيناريو: تشتكي مؤسسة من بطء معاملة تمر بـ 15 خطوة يدوية. ما هو الحل 'الأول' قبل أتمتة النظام؟", options: ["شراء خوادم جديدة", "تطبيق إعادة هندسة الإجراءات (BPR) لتبسيطها وإلغاء التكرار", "تعيين موظفين جدد", "تركيب كاميرات مراقبة"], answer: 1 },
+            { q: "سيناريو: بوابة حكومية أصيبت ببطء شديد وتوقفت لمدة 48 ساعة فجأة. التفسير الأمني الأرجح:", options: ["هجوم حجب الخدمة (DDoS)", "برامج فدية", "إهمال موظف", "حرب سيبرانية"], answer: 0 },
+            { q: "سيناريو: تسريب بيانات 25 ألف مواطن من نظام الجوازات. هذا يشير إلى:", options: ["توقف الكهرباء", "اختراق قواعد البيانات (Data Breach)", "هجوم DDoS", "مقاومة التغيير"], answer: 1 },
+            { q: "سيناريو: فريق أراد تقليد خدمة مؤسسة ناجحة (مقارنة معيارية) لكنهم فشلوا. السبب الأرجح:", options: ["التكنولوجيا كانت حديثة جداً", "نجاح المؤسسة الأخرى كان صدفة", "لم يقوموا بإصلاح وإعادة هندسة بيئتهم الداخلية (BPR) قبل التقليد", "الميزانية كانت ضخمة"], answer: 2 },
+            { q: "سيناريو: مواطن مسن يرفض استخدام التطبيق الحكومي لعدم قدرته على التعامل مع الهاتف. هذا معوق:", options: ["قانوني", "مالي", "تقني", "اجتماعي وثقافي"], answer: 3 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const questionNumber = document.getElementById('question-number');
+        const scoreTracker = document.getElementById('score-tracker');
+        const progressBar = document.getElementById('progress');
+        const effectsLayer = document.getElementById('effects-layer');
+
+        function startQuiz() {
+            startScreen.style.display = 'none';
+            quizScreen.style.display = 'block';
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            // تحديث الشريط والنصوص
+            const q = questions[currentQuestionIndex];
+            questionNumber.innerText = `السؤال ${currentQuestionIndex + 1} من ${questions.length}`;
+            scoreTracker.innerText = `النقاط: ${score}`;
+            const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            questionText.innerText = q.q;
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.classList.add('option');
+                btn.innerText = option;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            // تعطيل جميع الأزرار (امتحان باتجاه واحد، لا رجوع ولا تعديل)
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(btn => btn.disabled = true);
+
+            const correctIndex = questions[currentQuestionIndex].answer;
+
+            if (selectedIndex === correctIndex) {
+                btnElement.classList.add('correct');
+                score++;
+                scoreTracker.innerText = `النقاط: ${score}`;
+                showHeartsEffect();
+            } else {
+                btnElement.classList.add('wrong');
+                // تلوين الإجابة الصحيحة باللون الأخضر لتوضيحها للطالب
+                allOptions[correctIndex].classList.add('correct');
+                showAngryEffect();
+            }
+
+            // الانتقال للسؤال التالي بعد ثانية ونصف
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) {
+                    loadQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 1800);
+        }
+
+        // تأثير الإجابة الصحيحة (قلوب)
+        function showHeartsEffect() {
+            effectsLayer.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.innerText = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDelay = Math.random() * 0.5 + 's';
+                effectsLayer.appendChild(heart);
+            }
+        }
+
+        // تأثير الإجابة الخاطئة (وجه غاضب)
+        function showAngryEffect() {
+            effectsLayer.innerHTML = '';
+            const angry = document.createElement('div');
+            angry.classList.add('angry-face');
+            angry.innerText = '😡';
+            effectsLayer.appendChild(angry);
+        }
+
+        function endQuiz() {
+            quizScreen.style.display = 'none';
+            resultScreen.style.display = 'block';
+            progressBar.style.width = `100%`;
+            
+            const finalScoreElement = document.getElementById('final-score');
+            finalScoreElement.innerText = `${score} / ${questions.length}`;
+
+            let msg = "";
+            if(score === 40) msg = "علامة كاملة! بطل الحكومة الإلكترونية 🏆";
+            else if(score >= 30) msg = "ممتاز جداً! جاهز للامتحان بقوة 🔥";
+            else if(score >= 20) msg = "جيد، لكنك تحتاج لمراجعة بعض المفاهيم 👍";
+            else msg = "عليك مراجعة المادة بشكل أفضل يا قيس 📚";
+
+            document.getElementById('result-message').innerText = msg;
+            effectsLayer.innerHTML = ''; // تنظيف الشاشة من التأثيرات
+        }
+    </script>
+</body>
+</html>
